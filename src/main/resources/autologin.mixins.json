@@ -4,8 +4,7 @@
   "package": "com.autologin.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "ChatScreenMixin",
-    "EditBoxFormatterAccessor"
+    "ChatScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
