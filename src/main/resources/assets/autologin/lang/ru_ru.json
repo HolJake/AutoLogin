@@ -1,33 +1,7 @@
 {
   "autologin.config.title": "AutoLogin — Настройки",
-  "autologin.config.add_server": "+ Добавить сервер",
-  "autologin.config.trigger_words": "Слова-триггеры...",
-  "autologin.config.delay_label": "Задержка:",
-  "autologin.config.delay_unit": "мс",
-  "autologin.config.save": "Сохранить",
-  "autologin.config.cancel": "Отмена",
-  "autologin.config.no_servers": "Серверы не настроены",
-  "autologin.config.no_servers_hint": "Нажмите «+ Добавить сервер», чтобы начать",
-
-  "autologin.server_list.edit": "Изм.",
-  "autologin.server_list.delete": "✕",
-
-  "autologin.server_edit.title_add": "Добавить сервер",
-  "autologin.server_edit.title_edit": "Изменить сервер",
-  "autologin.server_edit.ip_label": "IP / Адрес сервера:",
-  "autologin.server_edit.ip_placeholder": "play.example.com  или  192.168.1.1:25565",
-  "autologin.server_edit.pass_label": "Пароль:",
-  "autologin.server_edit.pass_placeholder": "пароль",
-  "autologin.server_edit.save": "Сохранить",
-  "autologin.server_edit.cancel": "Отмена",
-  "autologin.server_edit.error_ip": "Введите адрес сервера",
-  "autologin.server_edit.error_pass": "Введите пароль",
-
-  "autologin.triggers.title": "Слова-триггеры",
-  "autologin.triggers.hint": "Если входящее сообщение содержит любое из этих слов — пароль отправится автоматически",
-  "autologin.triggers.add_placeholder": "Новое слово / фраза-триггер...",
-  "autologin.triggers.add": "Добавить",
-  "autologin.triggers.done": "Готово",
-  "autologin.triggers.empty": "Список пуст — добавьте слово ниже",
-  "autologin.triggers.remove": "✕"
+  "autologin.config.category": "Основное",
+  "autologin.config.delay": "Задержка входа (мс)",
+  "autologin.config.servers": "Серверы (формат: ip=пароль)",
+  "autologin.triggers.title": "Слова-триггеры для входа"
 }
