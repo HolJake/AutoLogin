@@ -36,7 +36,7 @@ public class AutoLoginConfig implements ConfigData {
     public long loginDelayMs = 300L;
 
     @ConfigEntry.Category("mod")
-    public Corner notificationCorner = Corner.TOP_RIGHT;
+    public Corner notificationCorner = Corner.BOTTOM_RIGHT;
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
