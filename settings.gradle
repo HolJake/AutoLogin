@@ -7,6 +7,3 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-
-rootProject.name = 'AutoLogin'
-include('v26')
