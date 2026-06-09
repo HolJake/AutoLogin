@@ -159,8 +159,9 @@ public class AutoLoginMod implements ClientModInitializer {
         if (!config.isLoginPrompt(messageText)) return;
 
         loginSentThisSession = true;
-        LOGGER.info("[AutoLogin] Login prompt on {}. Sending login for {}...",
-                currentServerIp, playerName);
+        String rootDomain = AutoLoginConfig.rootDomain(AutoLoginConfig.stripPort(currentServerIp));
+        LOGGER.info("[AutoLogin] Login prompt on {} (domain: {}). Sending login for {}...",
+                currentServerIp, rootDomain != null ? rootDomain : currentServerIp, playerName);
 
         Minecraft minecraft = Minecraft.getInstance();
         long delay = Math.max(0, config.loginDelayMs);

@@ -8,6 +8,7 @@
   "text.autoconfig.autologin.option.servers": "Server list",
   "text.autoconfig.autologin.option.servers.@Tooltip[0]": "One entry per line.",
   "text.autoconfig.autologin.option.servers.@Tooltip[1]": "Format: play.example.com|NickName=password  (passwords are saved automatically when you log in)",
+  "text.autoconfig.autologin.option.servers.@Tooltip[2]": "Servers sharing a domain (msk.holyworld.ru, play.holyworld.ru) are matched automatically and share the same password.",
 
   "text.autoconfig.autologin.option.triggerWords": "Login trigger words",
   "text.autoconfig.autologin.option.triggerWords.@Tooltip": "Password is sent when a chat message contains any of these words",

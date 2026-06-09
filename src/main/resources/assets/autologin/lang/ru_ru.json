@@ -7,7 +7,8 @@
 
   "text.autoconfig.autologin.option.servers": "Список серверов",
   "text.autoconfig.autologin.option.servers.@Tooltip[0]": "По одной записи на строку.",
-  "text.autoconfig.autologin.option.servers.@Tooltip[1]": "Формат: play.example.com|НикНейм=пароль  (пароли сохраняются автоматически при входе на сервер)",
+  "text.autoconfig.autologin.option.servers.@Tooltip[1]": "Формат: play.example.com|НикНейм=пароль  (пароли сохраняются автоматически при входе)",
+  "text.autoconfig.autologin.option.servers.@Tooltip[2]": "Серверы с одним доменом (msk.holyworld.ru, play.holyworld.ru) распознаются автоматически и используют один пароль.",
 
   "text.autoconfig.autologin.option.triggerWords": "Слова-триггеры для входа",
   "text.autoconfig.autologin.option.triggerWords.@Tooltip": "Пароль отправляется, когда сообщение в чате содержит любое из этих слов",

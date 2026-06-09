@@ -14,7 +14,7 @@ public class AutoLoginConfig implements ConfigData {
     public enum Corner { TOP_RIGHT, TOP_LEFT, BOTTOM_RIGHT, BOTTOM_LEFT }
 
     @ConfigEntry.Category("servers")
-    @ConfigEntry.Gui.Tooltip(count = 2)
+    @ConfigEntry.Gui.Tooltip(count = 3)
     public List<String> servers = new ArrayList<>();
 
     @ConfigEntry.Category("mod")
@@ -61,20 +61,28 @@ public class AutoLoginConfig implements ConfigData {
 
     /**
      * Looks up the password for the given server and player nickname.
-     * Priority: server|nickname entry → legacy server-only entry (backwards compat).
+     *
+     * Priority (highest to lowest):
+     *   1. Exact server|nick
+     *   2. Same root domain + nick  (e.g. msk.holyworld.ru matches play.holyworld.ru)
+     *   3. Exact server  (legacy, no nick)
+     *   4. Same root domain  (legacy, no nick)
      */
     public String getPassword(String serverAddress, String playerName) {
         if (serverAddress == null) return null;
         String incomingHost = stripPort(serverAddress);
+        String incomingRoot = rootDomain(incomingHost); // null for IPs / short names
 
-        // 1st pass — nickname-specific entry
-        if (playerName != null && !playerName.isBlank()) {
+        boolean hasNick = playerName != null && !playerName.isBlank();
+
+        // ── Pass 1: exact server|nick ─────────────────────────────────────────
+        if (hasNick) {
             for (String entry : servers) {
                 int eq = entry.indexOf('=');
                 if (eq <= 0) continue;
                 String key = entry.substring(0, eq).trim();
                 int pipe = key.indexOf('|');
-                if (pipe <= 0) continue; // no nickname in this entry
+                if (pipe <= 0) continue;
                 String ip   = key.substring(0, pipe).trim();
                 String nick = key.substring(pipe + 1).trim();
                 if (!nick.equalsIgnoreCase(playerName)) continue;
@@ -84,14 +92,48 @@ public class AutoLoginConfig implements ConfigData {
             }
         }
 
-        // 2nd pass — legacy entry without nickname (any nickname)
+        // ── Pass 2: root-domain|nick ──────────────────────────────────────────
+        if (hasNick && incomingRoot != null) {
+            for (String entry : servers) {
+                int eq = entry.indexOf('=');
+                if (eq <= 0) continue;
+                String key = entry.substring(0, eq).trim();
+                int pipe = key.indexOf('|');
+                if (pipe <= 0) continue;
+                String ip   = key.substring(0, pipe).trim();
+                String nick = key.substring(pipe + 1).trim();
+                if (!nick.equalsIgnoreCase(playerName)) continue;
+                String storedHost = stripPort(ip);
+                if (storedHost.equalsIgnoreCase(incomingHost)) continue; // already checked in pass 1
+                if (incomingRoot.equalsIgnoreCase(rootDomain(storedHost))) {
+                    return PasswordCrypto.decode(entry.substring(eq + 1));
+                }
+            }
+        }
+
+        // ── Pass 3: exact server (legacy, no nick) ────────────────────────────
         for (String entry : servers) {
             int eq = entry.indexOf('=');
             if (eq <= 0) continue;
             String key = entry.substring(0, eq).trim();
-            if (key.indexOf('|') >= 0) continue; // has nickname, already checked above
+            if (key.indexOf('|') >= 0) continue;
             if (key.equalsIgnoreCase(serverAddress) || stripPort(key).equalsIgnoreCase(incomingHost)) {
                 return PasswordCrypto.decode(entry.substring(eq + 1));
+            }
+        }
+
+        // ── Pass 4: root-domain (legacy, no nick) ─────────────────────────────
+        if (incomingRoot != null) {
+            for (String entry : servers) {
+                int eq = entry.indexOf('=');
+                if (eq <= 0) continue;
+                String key = entry.substring(0, eq).trim();
+                if (key.indexOf('|') >= 0) continue;
+                String storedHost = stripPort(key);
+                if (storedHost.equalsIgnoreCase(incomingHost)) continue; // already checked in pass 3
+                if (incomingRoot.equalsIgnoreCase(rootDomain(storedHost))) {
+                    return PasswordCrypto.decode(entry.substring(eq + 1));
+                }
             }
         }
 
@@ -110,5 +152,26 @@ public class AutoLoginConfig implements ConfigData {
     static String stripPort(String address) {
         int colon = address.lastIndexOf(':');
         return colon > 0 ? address.substring(0, colon) : address;
+    }
+
+    /**
+     * Returns the root domain (last two labels) of a hostname, or null if the
+     * host is an IP address or has fewer than three labels (no subdomain to strip).
+     *
+     * Examples:
+     *   msk.holyworld.ru  →  holyworld.ru
+     *   play.holyworld.ru →  holyworld.ru
+     *   mc.hypixel.net    →  hypixel.net
+     *   hypixel.net       →  null  (already root — exact match handles it)
+     *   192.168.1.1       →  null  (IP address)
+     *   localhost         →  null  (no dots)
+     */
+    static String rootDomain(String host) {
+        if (host == null || host.isEmpty()) return null;
+        // Numeric IPv4 — no domain matching
+        if (host.matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) return null;
+        String[] parts = host.split("\\.");
+        if (parts.length < 3) return null; // no subdomain present
+        return parts[parts.length - 2] + "." + parts[parts.length - 1];
     }
 }
