@@ -11,9 +11,11 @@ import java.util.List;
 @Config(name = "autologin")
 public class AutoLoginConfig implements ConfigData {
 
+    @ConfigEntry.Category("servers")
     @ConfigEntry.Gui.Tooltip(count = 1)
     public List<String> servers = new ArrayList<>();
 
+    @ConfigEntry.Category("mod")
     @ConfigEntry.Gui.Tooltip(count = 1)
     public List<String> triggerWords = new ArrayList<>(Arrays.asList(
             "/login",
@@ -28,6 +30,7 @@ public class AutoLoginConfig implements ConfigData {
             "use /login"
     ));
 
+    @ConfigEntry.Category("mod")
     public long loginDelayMs = 300L;
 
     // ── Helpers (not serialised) ──────────────────────────────────────────────

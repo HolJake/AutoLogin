@@ -1,7 +1,10 @@
 {
   "text.config.autologin.title": "AutoLogin — Settings",
 
-  "text.config.autologin.option.servers": "Servers",
+  "text.config.autologin.category.servers": "Servers",
+  "text.config.autologin.category.mod": "Mod Parameters",
+
+  "text.config.autologin.option.servers": "Server list",
   "text.config.autologin.option.servers.tooltip[0]": "One entry per line — format: play.example.com=mypassword",
 
   "text.config.autologin.option.triggerWords": "Login trigger words",
