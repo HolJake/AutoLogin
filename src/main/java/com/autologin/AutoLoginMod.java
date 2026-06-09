@@ -4,6 +4,7 @@ import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
+import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.Minecraft;
 import org.slf4j.Logger;
@@ -40,10 +41,39 @@ public class AutoLoginMod implements ClientModInitializer {
             loginSentThisSession = false;
         });
 
-        ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
-            if (!overlay) {
-                handleIncomingMessage(message.getString());
+        // Auto-save password when player manually types /login or /l
+        ClientSendMessageEvents.COMMAND.register(command -> {
+            if (currentServerIp == null) return;
+
+            String trimmed = command.trim();
+            String lower = trimmed.toLowerCase();
+            String password = null;
+
+            if (lower.startsWith("login ")) {
+                password = trimmed.substring("login ".length()).trim();
+            } else if (lower.startsWith("l ")) {
+                password = trimmed.substring("l ".length()).trim();
             }
+
+            if (password == null || password.isEmpty()) return;
+
+            final String serverIp = currentServerIp;
+            final String finalPassword = password;
+
+            // Replace existing entry for this server (or add new one)
+            config.servers.removeIf(entry -> {
+                int sep = entry.indexOf('=');
+                if (sep <= 0) return false;
+                return entry.substring(0, sep).trim().equalsIgnoreCase(serverIp);
+            });
+            config.servers.add(serverIp + "=" + finalPassword);
+            AutoConfig.getConfigHolder(AutoLoginConfig.class).save();
+            loginSentThisSession = true;
+            LOGGER.info("[AutoLogin] Password auto-saved for server: {}", serverIp);
+        });
+
+        ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
+            if (!overlay) handleIncomingMessage(message.getString());
         });
 
         ClientReceiveMessageEvents.CHAT.register((message, signedMessage, sender, params, receptionTimestamp) -> {
@@ -68,9 +98,7 @@ public class AutoLoginMod implements ClientModInitializer {
 
         new Thread(() -> {
             if (delay > 0) {
-                try {
-                    Thread.sleep(delay);
-                } catch (InterruptedException ignored) {}
+                try { Thread.sleep(delay); } catch (InterruptedException ignored) {}
             }
             minecraft.execute(() -> {
                 if (minecraft.player != null && minecraft.getConnection() != null) {

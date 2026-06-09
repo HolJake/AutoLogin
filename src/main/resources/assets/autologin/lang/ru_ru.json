@@ -1,14 +1,14 @@
 {
-  "text.config.autologin.title": "AutoLogin — Настройки",
+  "text.autoconfig.autologin.title": "AutoLogin — Настройки",
 
-  "text.config.autologin.category.servers": "Серверы",
-  "text.config.autologin.category.mod": "Параметры мода",
+  "text.autoconfig.autologin.category.servers": "Серверы",
+  "text.autoconfig.autologin.category.mod": "Параметры мода",
 
-  "text.config.autologin.option.servers": "Список серверов",
-  "text.config.autologin.option.servers.tooltip[0]": "По одной записи на строку — формат: play.example.com=мойпароль",
+  "text.autoconfig.autologin.option.servers": "Список серверов",
+  "text.autoconfig.autologin.option.servers.tooltip[0]": "По одной записи на строку — формат: play.example.com=мойпароль",
 
-  "text.config.autologin.option.triggerWords": "Слова-триггеры для входа",
-  "text.config.autologin.option.triggerWords.tooltip[0]": "Пароль отправляется, когда сообщение в чате содержит любое из этих слов",
+  "text.autoconfig.autologin.option.triggerWords": "Слова-триггеры для входа",
+  "text.autoconfig.autologin.option.triggerWords.tooltip[0]": "Пароль отправляется, когда сообщение в чате содержит любое из этих слов",
 
-  "text.config.autologin.option.loginDelayMs": "Задержка входа (мс)"
+  "text.autoconfig.autologin.option.loginDelayMs": "Задержка входа (мс)"
 }
