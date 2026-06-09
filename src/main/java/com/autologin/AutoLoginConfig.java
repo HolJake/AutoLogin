@@ -50,44 +50,13 @@ public class AutoLoginConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip(count = 4)
     public String transferImportKey = "";
 
-    /** Set to true by validatePostLoad when the config needs to be re-saved. */
-    @ConfigEntry.Gui.Excluded
-    public transient boolean needsSave = false;
-
     // ── ConfigData ────────────────────────────────────────────────────────────
 
     @Override
     public void validatePostLoad() {
-        boolean changed = false;
-
-        // Process a pending import
-        if (transferImportKey != null && !transferImportKey.isBlank()) {
-            List<String> imported = PasswordCrypto.importTransferKey(transferImportKey.trim());
-            if (imported != null) {
-                for (String entry : imported) {
-                    int sep = entry.indexOf('=');
-                    if (sep <= 0) continue;
-                    String ip = entry.substring(0, sep).trim();
-                    servers.removeIf(e -> {
-                        int s = e.indexOf('=');
-                        return s > 0 && e.substring(0, s).trim().equalsIgnoreCase(ip);
-                    });
-                    servers.add(entry);
-                }
-                changed = true;
-            }
-            transferImportKey = "";
-            changed = true;
-        }
-
-        // Regenerate export key to keep it in sync with current servers
-        String freshKey = PasswordCrypto.generateTransferKey(servers);
-        if (!freshKey.equals(transferExportKey)) {
-            transferExportKey = freshKey;
-            changed = true;
-        }
-
-        needsSave = changed;
+        // Keep the export key in sync when loading from disk (startup / external edits).
+        // Import processing happens in the save listener (AutoLoginMod) so it fires on GUI saves.
+        transferExportKey = PasswordCrypto.generateTransferKey(servers);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

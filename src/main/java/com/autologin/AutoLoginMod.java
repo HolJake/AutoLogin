@@ -11,6 +11,8 @@ import net.minecraft.network.chat.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 public class AutoLoginMod implements ClientModInitializer {
 
     public static final String MOD_ID = "autologin";
@@ -27,14 +29,49 @@ public class AutoLoginMod implements ClientModInitializer {
         config = AutoConfig.getConfigHolder(AutoLoginConfig.class).getConfig();
         AutoLoginToast.init();
 
-        // Re-save config if validatePostLoad made changes (export key refresh, import processing, migration)
-        AutoConfig.getConfigHolder(AutoLoginConfig.class).registerLoadListener((manager, data) -> {
-            if (data.needsSave) {
-                data.needsSave = false;
+        // This listener fires every time the user clicks Save in the settings GUI.
+        // It is the reliable hook for processing the transfer import key,
+        // because validatePostLoad() is NOT guaranteed to be called on GUI saves.
+        AutoConfig.getConfigHolder(AutoLoginConfig.class).registerSaveListener((manager, data) -> {
+            boolean changed = false;
+
+            // Process a pasted transfer key
+            if (data.transferImportKey != null && !data.transferImportKey.isBlank()) {
+                List<String> imported = PasswordCrypto.importTransferKey(data.transferImportKey.trim());
+                if (imported != null) {
+                    for (String entry : imported) {
+                        int sep = entry.indexOf('=');
+                        if (sep <= 0) continue;
+                        String ip = entry.substring(0, sep).trim();
+                        data.servers.removeIf(e -> {
+                            int s = e.indexOf('=');
+                            return s > 0 && e.substring(0, s).trim().equalsIgnoreCase(ip);
+                        });
+                        data.servers.add(entry);
+                    }
+                    LOGGER.info("[AutoLogin] Transfer key imported successfully.");
+                } else {
+                    LOGGER.warn("[AutoLogin] Transfer key is invalid or empty.");
+                }
+                data.transferImportKey = "";
+                changed = true;
+            }
+
+            // Refresh the export key to reflect the current server list
+            String freshKey = PasswordCrypto.generateTransferKey(data.servers);
+            if (!freshKey.equals(data.transferExportKey)) {
+                data.transferExportKey = freshKey;
+                changed = true;
+            }
+
+            // Re-save so the cleared importKey and updated exportKey are persisted.
+            // Uses execute() to avoid calling save() from within a save listener.
+            if (changed) {
                 Minecraft.getInstance().execute(() ->
                         AutoConfig.getConfigHolder(AutoLoginConfig.class).save());
             }
-            return net.minecraft.world.InteractionResult.PASS;
+
+            return net.minecraft.world.InteractionResult.SUCCESS;
         });
 
         migratePlaintextPasswords();
