@@ -1,46 +1,79 @@
 package com.autologin;
 
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.toasts.Toast;
-import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 
-public class AutoLoginToast implements Toast {
+import java.util.ArrayList;
+import java.util.List;
 
-    private static final int   WIDTH      = 220;
-    private static final int   HEIGHT     = 44;
-    private static final long  DISPLAY_MS = 4000L;
+public class AutoLoginToast {
 
-    private static final int BG     = 0xF0111111;
-    private static final int ACCENT = 0xFF44BB44;
-    private static final int CTITLE = 0xFF88FF88;
-    private static final int CMSG   = 0xFFDDDDDD;
+    private static final long DISPLAY_MS = 4000L;
+    private static final long FADE_MS    = 400L;
+    private static final int  WIDTH      = 220;
+    private static final int  HEIGHT     = 44;
 
-    private final Component message;
+    private static final List<Notification> queue = new ArrayList<>();
 
-    private AutoLoginToast(Component message) {
-        this.message = message;
+    public static void init() {
+        HudRenderCallback.EVENT.register(AutoLoginToast::renderHud);
     }
 
-    /** Call from any thread — schedules the toast on the main thread. */
+    /** Thread-safe: schedules display on the main thread. */
     public static void show(Component message) {
+        Minecraft.getInstance().execute(() -> queue.add(new Notification(message)));
+    }
+
+    private static void renderHud(GuiGraphics ctx, DeltaTracker delta) {
+        queue.removeIf(Notification::expired);
+        if (queue.isEmpty()) return;
+
         Minecraft mc = Minecraft.getInstance();
-        mc.execute(() -> mc.getToasts().addToast(new AutoLoginToast(message)));
+        int screenW = mc.getWindow().getGuiScaledWidth();
+        int y = 4;
+
+        for (Notification n : queue) {
+            int x = screenW - WIDTH - 4;
+            float alpha = n.alpha();
+            int a = (int)(alpha * 255);
+
+            // Background + left accent stripe + top line
+            ctx.fill(x,     y, x + WIDTH, y + HEIGHT, argb(0x11, 0x11, 0x11, (int)(alpha * 0xF0)));
+            ctx.fill(x,     y, x + 3,     y + HEIGHT, argb(0x44, 0xBB, 0x44, a));
+            ctx.fill(x + 3, y, x + WIDTH, y + 1,      argb(0x44, 0xBB, 0x44, a / 3));
+
+            ctx.drawString(mc.font, Component.translatable("autologin.toast.title"),
+                x + 8, y + 8,  argb(0x88, 0xFF, 0x88, a), false);
+            ctx.drawString(mc.font, n.message,
+                x + 8, y + 24, argb(0xDD, 0xDD, 0xDD, a), false);
+
+            y += HEIGHT + 2;
+        }
     }
 
-    @Override
-    public Visibility render(GuiGraphics ctx, ToastComponent toasts, long timeSinceLastVisible) {
-        ctx.fill(0, 0, WIDTH, HEIGHT, BG);
-        ctx.fill(0, 0, 3,     HEIGHT, ACCENT);
-
-        var font = toasts.getMinecraft().font;
-        ctx.drawString(font, Component.translatable("autologin.toast.title"), 8,  8, CTITLE, false);
-        ctx.drawString(font, message,                                          8, 24, CMSG,   false);
-
-        return timeSinceLastVisible >= DISPLAY_MS ? Visibility.HIDE : Visibility.SHOW;
+    private static int argb(int r, int g, int b, int a) {
+        return (Mth.clamp(a, 0, 255) << 24) | (r << 16) | (g << 8) | b;
     }
 
-    @Override public int width()  { return WIDTH;  }
-    @Override public int height() { return HEIGHT; }
+    private static class Notification {
+        final Component message;
+        final long shownAt = System.currentTimeMillis();
+
+        Notification(Component message) { this.message = message; }
+
+        long age()        { return System.currentTimeMillis() - shownAt; }
+        boolean expired() { return age() >= DISPLAY_MS; }
+
+        float alpha() {
+            long age = age();
+            if (age < FADE_MS) return (float) age / FADE_MS;
+            long remaining = DISPLAY_MS - age;
+            if (remaining < FADE_MS) return Math.max(0f, (float) remaining / FADE_MS);
+            return 1f;
+        }
+    }
 }

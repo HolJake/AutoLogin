@@ -25,6 +25,7 @@ public class AutoLoginMod implements ClientModInitializer {
     public void onInitializeClient() {
         AutoConfig.register(AutoLoginConfig.class, GsonConfigSerializer::new);
         config = AutoConfig.getConfigHolder(AutoLoginConfig.class).getConfig();
+        AutoLoginToast.init();
         LOGGER.info("[AutoLogin] Mod initialized. {} server(s) configured.", config.servers.size());
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
