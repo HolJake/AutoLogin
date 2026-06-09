@@ -93,7 +93,7 @@ public class ServerEditScreen extends Screen {
 
     @Override
     public void render(DrawContext ctx, int mx, int my, float delta) {
-        renderBackground(ctx, mx, my, delta);
+        ctx.fill(0, 0, width, height, 0x80000000);
 
         int cx = width / 2;
         int cy = height / 2;

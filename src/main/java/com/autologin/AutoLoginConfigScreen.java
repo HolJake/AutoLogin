@@ -89,7 +89,7 @@ public class AutoLoginConfigScreen extends Screen {
 
     @Override
     public void render(DrawContext ctx, int mx, int my, float delta) {
-        renderBackground(ctx, mx, my, delta);
+        ctx.fill(0, 0, width, height, 0xB0000000);
         super.render(ctx, mx, my, delta);
 
         ctx.drawCenteredTextWithShadow(textRenderer, title, width / 2, 11, 0xFFFFFF);
