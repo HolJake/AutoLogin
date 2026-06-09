@@ -5,10 +5,10 @@
   "text.autoconfig.autologin.category.mod": "Параметры мода",
 
   "text.autoconfig.autologin.option.servers": "Список серверов",
-  "text.autoconfig.autologin.option.servers.@Tooltip[0]": "По одной записи на строку — формат: play.example.com=мойпароль",
+  "text.autoconfig.autologin.option.servers.@Tooltip": "По одной записи на строку — формат: play.example.com=мойпароль",
 
   "text.autoconfig.autologin.option.triggerWords": "Слова-триггеры для входа",
-  "text.autoconfig.autologin.option.triggerWords.@Tooltip[0]": "Пароль отправляется, когда сообщение в чате содержит любое из этих слов",
+  "text.autoconfig.autologin.option.triggerWords.@Tooltip": "Пароль отправляется, когда сообщение в чате содержит любое из этих слов",
 
   "text.autoconfig.autologin.option.loginDelayMs": "Задержка входа (мс)",
 

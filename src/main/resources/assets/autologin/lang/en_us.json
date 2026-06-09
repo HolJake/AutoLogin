@@ -5,10 +5,10 @@
   "text.autoconfig.autologin.category.mod": "Mod Parameters",
 
   "text.autoconfig.autologin.option.servers": "Server list",
-  "text.autoconfig.autologin.option.servers.@Tooltip[0]": "One entry per line — format: play.example.com=mypassword",
+  "text.autoconfig.autologin.option.servers.@Tooltip": "One entry per line — format: play.example.com=mypassword",
 
   "text.autoconfig.autologin.option.triggerWords": "Login trigger words",
-  "text.autoconfig.autologin.option.triggerWords.@Tooltip[0]": "Password is sent when a chat message contains any of these words",
+  "text.autoconfig.autologin.option.triggerWords.@Tooltip": "Password is sent when a chat message contains any of these words",
 
   "text.autoconfig.autologin.option.loginDelayMs": "Login delay (ms)",
 
