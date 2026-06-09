@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,35 +42,36 @@ public class AutoLoginMod implements ClientModInitializer {
             loginSentThisSession = false;
         });
 
-        // Auto-save password when player manually types /login or /l
+        // Auto-save password when player manually types an auth command
         ClientSendMessageEvents.COMMAND.register(command -> {
             if (currentServerIp == null) return;
 
             String trimmed = command.trim();
             String lower = trimmed.toLowerCase();
-            String password = null;
-
-            if (lower.startsWith("login ")) {
-                password = trimmed.substring("login ".length()).trim();
-            } else if (lower.startsWith("l ")) {
-                password = trimmed.substring("l ".length()).trim();
-            }
+            String password = extractPassword(lower, trimmed,
+                    "login ", "l ", "register ", "reg ");
 
             if (password == null || password.isEmpty()) return;
 
             final String serverIp = currentServerIp;
-            final String finalPassword = password;
 
-            // Replace existing entry for this server (or add new one)
+            // Replace or add entry for this server
             config.servers.removeIf(entry -> {
                 int sep = entry.indexOf('=');
                 if (sep <= 0) return false;
                 return entry.substring(0, sep).trim().equalsIgnoreCase(serverIp);
             });
-            config.servers.add(serverIp + "=" + finalPassword);
+            config.servers.add(serverIp + "=" + password);
             AutoConfig.getConfigHolder(AutoLoginConfig.class).save();
             loginSentThisSession = true;
-            LOGGER.info("[AutoLogin] Password auto-saved for server: {}", serverIp);
+            LOGGER.info("[AutoLogin] Password saved for server: {}", serverIp);
+
+            // Notify the player in chat
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.player != null) {
+                mc.player.displayClientMessage(
+                    Component.translatable("autologin.message.saved", serverIp), false);
+            }
         });
 
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
@@ -79,6 +81,23 @@ public class AutoLoginMod implements ClientModInitializer {
         ClientReceiveMessageEvents.CHAT.register((message, signedMessage, sender, params, receptionTimestamp) -> {
             handleIncomingMessage(message.getString());
         });
+    }
+
+    /**
+     * Extracts the password (first word after the command prefix) from the raw command.
+     * Handles both "command password" and "command password password" (with confirmation).
+     */
+    private static String extractPassword(String lower, String original, String... prefixes) {
+        for (String prefix : prefixes) {
+            if (lower.startsWith(prefix)) {
+                String rest = original.substring(prefix.length()).trim();
+                if (rest.isEmpty()) return null;
+                // If "pass pass" confirmation format — take first token
+                int space = rest.indexOf(' ');
+                return space > 0 ? rest.substring(0, space) : rest;
+            }
+        }
+        return null;
     }
 
     private void handleIncomingMessage(String messageText) {
@@ -104,6 +123,10 @@ public class AutoLoginMod implements ClientModInitializer {
                 if (minecraft.player != null && minecraft.getConnection() != null) {
                     minecraft.getConnection().sendCommand("login " + password);
                     LOGGER.info("[AutoLogin] Login command sent for server: {}", currentServerIp);
+
+                    // Notify the player in the action bar (non-intrusive)
+                    minecraft.player.displayClientMessage(
+                        Component.translatable("autologin.message.sent"), true);
                 }
             });
         }, "autologin-thread").start();

@@ -10,5 +10,8 @@
   "text.autoconfig.autologin.option.triggerWords": "Слова-триггеры для входа",
   "text.autoconfig.autologin.option.triggerWords.tooltip[0]": "Пароль отправляется, когда сообщение в чате содержит любое из этих слов",
 
-  "text.autoconfig.autologin.option.loginDelayMs": "Задержка входа (мс)"
+  "text.autoconfig.autologin.option.loginDelayMs": "Задержка входа (мс)",
+
+  "autologin.message.sent": "§a[AutoLogin] §fПароль отправлен автоматически",
+  "autologin.message.saved": "§a[AutoLogin] §fПароль сохранён для §e%s"
 }
