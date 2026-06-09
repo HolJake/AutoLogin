@@ -132,9 +132,15 @@ public class TriggerWordsScreen extends Screen {
             }
 
             @Override
-            public void render(DrawContext ctx, int index, int y, int x,
-                               int w, int h, int mx, int my, boolean hovered, float delta) {
-                if (hovered) ctx.fill(x, y, x + w, y + h, 0x1AFFFFFF);
+            public void render(DrawContext ctx, int index, int y, boolean hovered, float delta) {
+                int x = WordListWidget.this.getRowLeft();
+                int w = WordListWidget.this.getRowWidth();
+
+                MinecraftClient mc = MinecraftClient.getInstance();
+                int mx = (int)(mc.mouse.getX() / mc.getWindow().getScaleFactor());
+                int my = (int)(mc.mouse.getY() / mc.getWindow().getScaleFactor());
+
+                if (hovered) ctx.fill(x, y, x + w, y + 22, 0x1AFFFFFF);
                 if (index > 0) ctx.fill(x + 4, y, x + w - 4, y + 1, 0x22FFFFFF);
 
                 ctx.drawTextWithShadow(client.textRenderer, word, x + 10, y + 5, 0xFFFFFF);

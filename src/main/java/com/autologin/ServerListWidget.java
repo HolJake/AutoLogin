@@ -48,11 +48,16 @@ public class ServerListWidget extends EntryListWidget<ServerListWidget.ServerEnt
         }
 
         @Override
-        public void render(DrawContext ctx, int index, int y, int x,
-                           int entryWidth, int entryHeight,
-                           int mx, int my, boolean hovered, float delta) {
+        public void render(DrawContext ctx, int index, int y, boolean hovered, float delta) {
+            int x = ServerListWidget.this.getRowLeft();
+            int entryWidth = ServerListWidget.this.getRowWidth();
+
+            MinecraftClient mc = MinecraftClient.getInstance();
+            int mx = (int)(mc.mouse.getX() / mc.getWindow().getScaleFactor());
+            int my = (int)(mc.mouse.getY() / mc.getWindow().getScaleFactor());
+
             if (hovered) {
-                ctx.fill(x, y, x + entryWidth, y + entryHeight, 0x1AFFFFFF);
+                ctx.fill(x, y, x + entryWidth, y + 26, 0x1AFFFFFF);
             }
             if (index > 0) {
                 ctx.fill(x + 4, y, x + entryWidth - 4, y + 1, 0x22FFFFFF);
