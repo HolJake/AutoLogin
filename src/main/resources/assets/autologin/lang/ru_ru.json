@@ -6,7 +6,8 @@
   "text.autoconfig.autologin.category.transfer": "Перенос паролей",
 
   "text.autoconfig.autologin.option.servers": "Список серверов",
-  "text.autoconfig.autologin.option.servers.@Tooltip": "По одной записи на строку — формат: play.example.com=мойпароль",
+  "text.autoconfig.autologin.option.servers.@Tooltip[0]": "По одной записи на строку.",
+  "text.autoconfig.autologin.option.servers.@Tooltip[1]": "Формат: play.example.com|НикНейм=пароль  (пароли сохраняются автоматически при входе на сервер)",
 
   "text.autoconfig.autologin.option.triggerWords": "Слова-триггеры для входа",
   "text.autoconfig.autologin.option.triggerWords.@Tooltip": "Пароль отправляется, когда сообщение в чате содержит любое из этих слов",
@@ -33,5 +34,5 @@
 
   "autologin.toast.title": "[AutoLogin]",
   "autologin.message.sent": "Пароль отправлен автоматически",
-  "autologin.message.saved": "Пароль сохранён для: %s"
+  "autologin.message.saved": "Пароль сохранён: %s @ %s"
 }

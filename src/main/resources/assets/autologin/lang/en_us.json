@@ -6,7 +6,8 @@
   "text.autoconfig.autologin.category.transfer": "Password Transfer",
 
   "text.autoconfig.autologin.option.servers": "Server list",
-  "text.autoconfig.autologin.option.servers.@Tooltip": "One entry per line — format: play.example.com=mypassword",
+  "text.autoconfig.autologin.option.servers.@Tooltip[0]": "One entry per line.",
+  "text.autoconfig.autologin.option.servers.@Tooltip[1]": "Format: play.example.com|NickName=password  (passwords are saved automatically when you log in)",
 
   "text.autoconfig.autologin.option.triggerWords": "Login trigger words",
   "text.autoconfig.autologin.option.triggerWords.@Tooltip": "Password is sent when a chat message contains any of these words",
@@ -33,5 +34,5 @@
 
   "autologin.toast.title": "[AutoLogin]",
   "autologin.message.sent": "Password sent automatically",
-  "autologin.message.saved": "Password saved for: %s"
+  "autologin.message.saved": "Password saved: %s @ %s"
 }

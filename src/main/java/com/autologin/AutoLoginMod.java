@@ -29,23 +29,20 @@ public class AutoLoginMod implements ClientModInitializer {
         config = AutoConfig.getConfigHolder(AutoLoginConfig.class).getConfig();
         AutoLoginToast.init();
 
-        // This listener fires every time the user clicks Save in the settings GUI.
-        // It is the reliable hook for processing the transfer import key,
-        // because validatePostLoad() is NOT guaranteed to be called on GUI saves.
+        // Fires when user clicks Save in the settings GUI — used to process transfer key import.
         AutoConfig.getConfigHolder(AutoLoginConfig.class).registerSaveListener((manager, data) -> {
             boolean changed = false;
 
-            // Process a pasted transfer key
             if (data.transferImportKey != null && !data.transferImportKey.isBlank()) {
                 List<String> imported = PasswordCrypto.importTransferKey(data.transferImportKey.trim());
                 if (imported != null) {
                     for (String entry : imported) {
                         int sep = entry.indexOf('=');
                         if (sep <= 0) continue;
-                        String ip = entry.substring(0, sep).trim();
+                        String importedKey = entry.substring(0, sep).trim();
                         data.servers.removeIf(e -> {
                             int s = e.indexOf('=');
-                            return s > 0 && e.substring(0, s).trim().equalsIgnoreCase(ip);
+                            return s > 0 && e.substring(0, s).trim().equalsIgnoreCase(importedKey);
                         });
                         data.servers.add(entry);
                     }
@@ -57,15 +54,12 @@ public class AutoLoginMod implements ClientModInitializer {
                 changed = true;
             }
 
-            // Refresh the export key to reflect the current server list
             String freshKey = PasswordCrypto.generateTransferKey(data.servers);
             if (!freshKey.equals(data.transferExportKey)) {
                 data.transferExportKey = freshKey;
                 changed = true;
             }
 
-            // Re-save so the cleared importKey and updated exportKey are persisted.
-            // Uses execute() to avoid calling save() from within a save listener.
             if (changed) {
                 Minecraft.getInstance().execute(() ->
                         AutoConfig.getConfigHolder(AutoLoginConfig.class).save());
@@ -81,7 +75,8 @@ public class AutoLoginMod implements ClientModInitializer {
             loginSentThisSession = false;
             if (client.getCurrentServer() != null) {
                 currentServerIp = client.getCurrentServer().ip;
-                LOGGER.info("[AutoLogin] Connected to: {}", currentServerIp);
+                LOGGER.info("[AutoLogin] Connected to: {} as {}",
+                        currentServerIp, client.getUser().getName());
             } else {
                 currentServerIp = null;
             }
@@ -92,32 +87,44 @@ public class AutoLoginMod implements ClientModInitializer {
             loginSentThisSession = false;
         });
 
-        // Auto-save password when player manually types an auth command
+        // Auto-save password when player manually types an auth command.
+        // Entry is stored as  server|nickname=ENC:...  so each account gets its own password.
         ClientSendMessageEvents.COMMAND.register(command -> {
             if (currentServerIp == null) return;
-            // Skip if auto-login already sent this command programmatically
             if (loginSentThisSession) return;
 
             String trimmed = command.trim();
-            String lower = trimmed.toLowerCase();
+            String lower   = trimmed.toLowerCase();
             String password = extractPassword(lower, trimmed,
                     "login ", "l ", "register ", "reg ");
 
             if (password == null || password.isEmpty()) return;
 
-            final String serverIp = currentServerIp;
+            final String serverIp   = currentServerIp;
+            final String playerName = Minecraft.getInstance().getUser().getName();
+            final String entryKey   = serverIp + "|" + playerName;
+            final String serverHost = AutoLoginConfig.stripPort(serverIp);
 
             config.servers.removeIf(entry -> {
                 int sep = entry.indexOf('=');
                 if (sep <= 0) return false;
-                return entry.substring(0, sep).trim().equalsIgnoreCase(serverIp);
+                String key = entry.substring(0, sep).trim();
+                // Remove exact server|nick match
+                if (key.equalsIgnoreCase(entryKey)) return true;
+                // Also remove old-format (no nick) entry for this server → migrate it
+                if (key.indexOf('|') < 0) {
+                    return key.equalsIgnoreCase(serverIp)
+                            || AutoLoginConfig.stripPort(key).equalsIgnoreCase(serverHost);
+                }
+                return false;
             });
-            config.servers.add(serverIp + "=" + PasswordCrypto.encode(password));
+
+            config.servers.add(entryKey + "=" + PasswordCrypto.encode(password));
             AutoConfig.getConfigHolder(AutoLoginConfig.class).save();
             loginSentThisSession = true;
-            LOGGER.info("[AutoLogin] Password saved for server: {}", serverIp);
+            LOGGER.info("[AutoLogin] Password saved for {}@{}", playerName, serverIp);
 
-            AutoLoginToast.show(Component.translatable("autologin.message.saved", serverIp));
+            AutoLoginToast.show(Component.translatable("autologin.message.saved", playerName, serverIp));
         });
 
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
@@ -145,13 +152,15 @@ public class AutoLoginMod implements ClientModInitializer {
         if (currentServerIp == null) return;
         if (loginSentThisSession) return;
 
-        String password = config.getPassword(currentServerIp);
+        String playerName = Minecraft.getInstance().getUser().getName();
+        String password   = config.getPassword(currentServerIp, playerName);
         if (password == null) return;
 
         if (!config.isLoginPrompt(messageText)) return;
 
         loginSentThisSession = true;
-        LOGGER.info("[AutoLogin] Login prompt detected on {}. Sending login command...", currentServerIp);
+        LOGGER.info("[AutoLogin] Login prompt on {}. Sending login for {}...",
+                currentServerIp, playerName);
 
         Minecraft minecraft = Minecraft.getInstance();
         long delay = Math.max(0, config.loginDelayMs);
@@ -163,8 +172,8 @@ public class AutoLoginMod implements ClientModInitializer {
             minecraft.execute(() -> {
                 if (minecraft.player != null && minecraft.getConnection() != null) {
                     minecraft.getConnection().sendCommand("login " + password);
-                    LOGGER.info("[AutoLogin] Login command sent for server: {}", currentServerIp);
-
+                    LOGGER.info("[AutoLogin] Login command sent for {}@{}",
+                            playerName, currentServerIp);
                     AutoLoginToast.show(Component.translatable("autologin.message.sent"));
                 }
             });

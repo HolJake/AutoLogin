@@ -14,7 +14,7 @@ public class AutoLoginConfig implements ConfigData {
     public enum Corner { TOP_RIGHT, TOP_LEFT, BOTTOM_RIGHT, BOTTOM_LEFT }
 
     @ConfigEntry.Category("servers")
-    @ConfigEntry.Gui.Tooltip(count = 1)
+    @ConfigEntry.Gui.Tooltip(count = 2)
     public List<String> servers = new ArrayList<>();
 
     @ConfigEntry.Category("mod")
@@ -54,24 +54,47 @@ public class AutoLoginConfig implements ConfigData {
 
     @Override
     public void validatePostLoad() {
-        // Keep the export key in sync when loading from disk (startup / external edits).
-        // Import processing happens in the save listener (AutoLoginMod) so it fires on GUI saves.
         transferExportKey = PasswordCrypto.generateTransferKey(servers);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    public String getPassword(String serverAddress) {
+    /**
+     * Looks up the password for the given server and player nickname.
+     * Priority: server|nickname entry → legacy server-only entry (backwards compat).
+     */
+    public String getPassword(String serverAddress, String playerName) {
         if (serverAddress == null) return null;
         String incomingHost = stripPort(serverAddress);
-        for (String entry : servers) {
-            int sep = entry.indexOf('=');
-            if (sep <= 0) continue;
-            String ip = entry.substring(0, sep).trim();
-            if (ip.equalsIgnoreCase(serverAddress) || stripPort(ip).equalsIgnoreCase(incomingHost)) {
-                return PasswordCrypto.decode(entry.substring(sep + 1));
+
+        // 1st pass — nickname-specific entry
+        if (playerName != null && !playerName.isBlank()) {
+            for (String entry : servers) {
+                int eq = entry.indexOf('=');
+                if (eq <= 0) continue;
+                String key = entry.substring(0, eq).trim();
+                int pipe = key.indexOf('|');
+                if (pipe <= 0) continue; // no nickname in this entry
+                String ip   = key.substring(0, pipe).trim();
+                String nick = key.substring(pipe + 1).trim();
+                if (!nick.equalsIgnoreCase(playerName)) continue;
+                if (ip.equalsIgnoreCase(serverAddress) || stripPort(ip).equalsIgnoreCase(incomingHost)) {
+                    return PasswordCrypto.decode(entry.substring(eq + 1));
+                }
             }
         }
+
+        // 2nd pass — legacy entry without nickname (any nickname)
+        for (String entry : servers) {
+            int eq = entry.indexOf('=');
+            if (eq <= 0) continue;
+            String key = entry.substring(0, eq).trim();
+            if (key.indexOf('|') >= 0) continue; // has nickname, already checked above
+            if (key.equalsIgnoreCase(serverAddress) || stripPort(key).equalsIgnoreCase(incomingHost)) {
+                return PasswordCrypto.decode(entry.substring(eq + 1));
+            }
+        }
+
         return null;
     }
 
@@ -84,7 +107,7 @@ public class AutoLoginConfig implements ConfigData {
         return false;
     }
 
-    private static String stripPort(String address) {
+    static String stripPort(String address) {
         int colon = address.lastIndexOf(':');
         return colon > 0 ? address.substring(0, colon) : address;
     }
