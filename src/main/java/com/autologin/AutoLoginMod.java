@@ -46,6 +46,8 @@ public class AutoLoginMod implements ClientModInitializer {
         // Auto-save password when player manually types an auth command
         ClientSendMessageEvents.COMMAND.register(command -> {
             if (currentServerIp == null) return;
+            // Skip if auto-login already sent this command programmatically
+            if (loginSentThisSession) return;
 
             String trimmed = command.trim();
             String lower = trimmed.toLowerCase();
