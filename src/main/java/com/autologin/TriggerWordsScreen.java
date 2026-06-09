@@ -26,7 +26,7 @@ public class TriggerWordsScreen extends Screen {
     private TextFieldWidget addField;
 
     public TriggerWordsScreen(Screen parent, AutoLoginConfig config) {
-        super(Text.literal("Trigger Words"));
+        super(Text.translatable("autologin.triggers.title"));
         this.parent = parent;
         this.config = config;
         this.words = new ArrayList<>(config.triggerWords);
@@ -44,13 +44,13 @@ public class TriggerWordsScreen extends Screen {
         int y = height - FOOTER_H + 6;
         addField = new TextFieldWidget(textRenderer, width / 2 - 140, y, 180, 18, Text.empty());
         addField.setMaxLength(128);
-        addField.setPlaceholder(Text.literal("New trigger word / phrase..."));
+        addField.setPlaceholder(Text.translatable("autologin.triggers.add_placeholder"));
         addDrawableChild(addField);
 
-        addDrawableChild(ButtonWidget.builder(Text.literal("Add"), btn -> addWord())
+        addDrawableChild(ButtonWidget.builder(Text.translatable("autologin.triggers.add"), btn -> addWord())
             .dimensions(width / 2 + 44, y - 1, 48, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(Text.literal("Done"), btn -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("autologin.triggers.done"), btn -> {
             config.triggerWords = new ArrayList<>(words);
             config.save();
             client.setScreen(parent);
@@ -80,7 +80,7 @@ public class TriggerWordsScreen extends Screen {
 
         ctx.drawCenteredTextWithShadow(textRenderer, title, width / 2, 11, 0xFFFFFF);
         ctx.drawCenteredTextWithShadow(textRenderer,
-            Text.literal("If any word appears in a login message, the password is sent automatically"),
+            Text.translatable("autologin.triggers.hint"),
             width / 2, 21, 0x888888);
 
         ctx.fill(0, HEADER_H - 2, width, HEADER_H - 1, 0x55FFFFFF);
@@ -88,7 +88,7 @@ public class TriggerWordsScreen extends Screen {
 
         if (words.isEmpty()) {
             ctx.drawCenteredTextWithShadow(textRenderer,
-                Text.literal("No trigger words — add one below"), width / 2, height / 2, 0x888888);
+                Text.translatable("autologin.triggers.empty"), width / 2, height / 2, 0x888888);
         }
     }
 
@@ -128,7 +128,7 @@ public class TriggerWordsScreen extends Screen {
 
             WordEntry(String word) {
                 this.word = word;
-                this.removeBtn = ButtonWidget.builder(Text.literal("✕"), b ->
+                this.removeBtn = ButtonWidget.builder(Text.translatable("autologin.triggers.remove"), b ->
                     TriggerWordsScreen.this.removeWord(word)
                 ).dimensions(0, 0, 18, 14).build();
             }

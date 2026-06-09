@@ -40,10 +40,10 @@ public class ServerListWidget extends EntryListWidget<ServerListWidget.ServerEnt
         ServerEntry(String ip, String password) {
             this.ip = ip;
             this.password = password;
-            this.editBtn = ButtonWidget.builder(Text.literal("Edit"), b ->
+            this.editBtn = ButtonWidget.builder(Text.translatable("autologin.server_list.edit"), b ->
                 screen.openEditScreen(ip, password)
             ).dimensions(0, 0, 48, 16).build();
-            this.deleteBtn = ButtonWidget.builder(Text.literal("✕"), b ->
+            this.deleteBtn = ButtonWidget.builder(Text.translatable("autologin.server_list.delete"), b ->
                 screen.deleteServer(ip)
             ).dimensions(0, 0, 18, 16).build();
         }

@@ -24,7 +24,7 @@ public class ServerEditScreen extends Screen {
      * @param existingPass null when adding a new server
      */
     public ServerEditScreen(AutoLoginConfigScreen parent, String existingIp, String existingPass) {
-        super(Text.literal(existingIp == null ? "Add Server" : "Edit Server"));
+        super(Text.translatable(existingIp == null ? "autologin.server_edit.title_add" : "autologin.server_edit.title_edit"));
         this.parent = parent;
         this.originalIp = existingIp;
         this.originalPass = existingPass;
@@ -40,7 +40,7 @@ public class ServerEditScreen extends Screen {
         // IP field
         ipField = new TextFieldWidget(textRenderer, fieldX, cy - 28, fieldW, 18, Text.empty());
         ipField.setMaxLength(255);
-        ipField.setPlaceholder(Text.literal("play.example.com  or  1.2.3.4:25565"));
+        ipField.setPlaceholder(Text.translatable("autologin.server_edit.ip_placeholder"));
         if (originalIp != null) ipField.setText(originalIp);
         addDrawableChild(ipField);
 
@@ -48,7 +48,7 @@ public class ServerEditScreen extends Screen {
         int passW = fieldW - 24;
         passField = new TextFieldWidget(textRenderer, fieldX, cy + 12, passW, 18, Text.empty());
         passField.setMaxLength(128);
-        passField.setPlaceholder(Text.literal("password"));
+        passField.setPlaceholder(Text.translatable("autologin.server_edit.pass_placeholder"));
         if (originalPass != null) passField.setText(originalPass);
         applyMask();
         addDrawableChild(passField);
@@ -60,9 +60,9 @@ public class ServerEditScreen extends Screen {
         }).dimensions(fieldX + passW + 2, cy + 12, 22, 18).build());
 
         // Save / Cancel
-        addDrawableChild(ButtonWidget.builder(Text.literal("Save"), btn -> trySave())
+        addDrawableChild(ButtonWidget.builder(Text.translatable("autologin.server_edit.save"), btn -> trySave())
             .dimensions(cx - 83, cy + 40, 78, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Cancel"), btn ->
+        addDrawableChild(ButtonWidget.builder(Text.translatable("autologin.server_edit.cancel"), btn ->
             client.setScreen(parent)
         ).dimensions(cx + 5, cy + 40, 78, 20).build());
 
@@ -116,9 +116,9 @@ public class ServerEditScreen extends Screen {
         ctx.drawCenteredTextWithShadow(textRenderer, title, cx, py + 8, 0xFFFFFF);
 
         // Labels
-        ctx.drawTextWithShadow(textRenderer, Text.literal("Server IP / Address:"),
+        ctx.drawTextWithShadow(textRenderer, Text.translatable("autologin.server_edit.ip_label"),
             px + 10, cy - 40, 0xCCCCCC);
-        ctx.drawTextWithShadow(textRenderer, Text.literal("Password:"),
+        ctx.drawTextWithShadow(textRenderer, Text.translatable("autologin.server_edit.pass_label"),
             px + 10, cy, 0xCCCCCC);
 
         // Validation hint — show only when both fields have been touched
@@ -126,9 +126,10 @@ public class ServerEditScreen extends Screen {
             boolean ipOk = !ipField.getText().trim().isEmpty();
             boolean passOk = !passField.getText().isEmpty();
             if (!ipOk || !passOk) {
-                String hint = !ipOk ? "Please enter a server address" : "Please enter a password";
-                ctx.drawCenteredTextWithShadow(textRenderer,
-                    Text.literal(hint), cx, py + PANEL_H + 4, 0xFF6666);
+                Text hint = !ipOk
+                    ? Text.translatable("autologin.server_edit.error_ip")
+                    : Text.translatable("autologin.server_edit.error_pass");
+                ctx.drawCenteredTextWithShadow(textRenderer, hint, cx, py + PANEL_H + 4, 0xFF6666);
             }
         }
 

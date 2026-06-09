@@ -1,0 +1,33 @@
+{
+  "autologin.config.title": "AutoLogin — Settings",
+  "autologin.config.add_server": "+ Add Server",
+  "autologin.config.trigger_words": "Trigger Words...",
+  "autologin.config.delay_label": "Delay:",
+  "autologin.config.delay_unit": "ms",
+  "autologin.config.save": "Save",
+  "autologin.config.cancel": "Cancel",
+  "autologin.config.no_servers": "No servers configured",
+  "autologin.config.no_servers_hint": "Click \"+ Add Server\" to get started",
+
+  "autologin.server_list.edit": "Edit",
+  "autologin.server_list.delete": "✕",
+
+  "autologin.server_edit.title_add": "Add Server",
+  "autologin.server_edit.title_edit": "Edit Server",
+  "autologin.server_edit.ip_label": "Server IP / Address:",
+  "autologin.server_edit.ip_placeholder": "play.example.com  or  192.168.1.1:25565",
+  "autologin.server_edit.pass_label": "Password:",
+  "autologin.server_edit.pass_placeholder": "password",
+  "autologin.server_edit.save": "Save",
+  "autologin.server_edit.cancel": "Cancel",
+  "autologin.server_edit.error_ip": "Please enter a server address",
+  "autologin.server_edit.error_pass": "Please enter a password",
+
+  "autologin.triggers.title": "Trigger Words",
+  "autologin.triggers.hint": "If a login message contains any of these words, the password is sent automatically",
+  "autologin.triggers.add_placeholder": "New trigger word / phrase...",
+  "autologin.triggers.add": "Add",
+  "autologin.triggers.done": "Done",
+  "autologin.triggers.empty": "No trigger words — add one below",
+  "autologin.triggers.remove": "✕"
+}

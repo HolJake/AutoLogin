@@ -22,7 +22,7 @@ public class AutoLoginConfigScreen extends Screen {
     private TextFieldWidget delayField;
 
     public AutoLoginConfigScreen(Screen parent) {
-        super(Text.literal("AutoLogin — Settings"));
+        super(Text.translatable("autologin.config.title"));
         this.parent = parent;
         this.config = AutoLoginMod.getConfig();
         this.editedServers = new LinkedHashMap<>(config.servers);
@@ -38,14 +38,14 @@ public class AutoLoginConfigScreen extends Screen {
 
         // ── Footer row 1: Add Server ──────────────────────────────────────────
         int y1 = height - FOOTER_H + 4;
-        addDrawableChild(ButtonWidget.builder(Text.literal("+ Add Server"), btn ->
+        addDrawableChild(ButtonWidget.builder(Text.translatable("autologin.config.add_server"), btn ->
             client.setScreen(new ServerEditScreen(this, null, null))
         ).dimensions(width / 2 - 80, y1, 160, 20).build());
 
         // ── Footer row 2: Trigger Words | Delay | Save | Cancel ───────────────
         int y2 = height - FOOTER_H + 28;
 
-        addDrawableChild(ButtonWidget.builder(Text.literal("Trigger Words..."), btn ->
+        addDrawableChild(ButtonWidget.builder(Text.translatable("autologin.config.trigger_words"), btn ->
             client.setScreen(new TriggerWordsScreen(this, config))
         ).dimensions(width / 2 - 156, y2, 110, 20).build());
 
@@ -54,12 +54,12 @@ public class AutoLoginConfigScreen extends Screen {
         delayField.setTextPredicate(s -> s.isEmpty() || s.matches("\\d{0,5}"));
         addDrawableChild(delayField);
 
-        addDrawableChild(ButtonWidget.builder(Text.literal("Save"), btn -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("autologin.config.save"), btn -> {
             applyAndSave();
             client.setScreen(parent);
         }).dimensions(width / 2 + 22, y2, 58, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(Text.literal("Cancel"), btn ->
+        addDrawableChild(ButtonWidget.builder(Text.translatable("autologin.config.cancel"), btn ->
             client.setScreen(parent)
         ).dimensions(width / 2 + 84, y2, 70, 20).build());
     }
@@ -100,16 +100,16 @@ public class AutoLoginConfigScreen extends Screen {
 
         // Delay label (inline with field on footer row 2)
         int y2 = height - FOOTER_H + 28;
-        ctx.drawTextWithShadow(textRenderer, Text.literal("Delay:"), width / 2 - 82, y2 + 5, 0xAAAAAA);
-        ctx.drawTextWithShadow(textRenderer, Text.literal("ms"), width / 2 + 18, y2 + 5, 0x888888);
+        ctx.drawTextWithShadow(textRenderer, Text.translatable("autologin.config.delay_label"), width / 2 - 82, y2 + 5, 0xAAAAAA);
+        ctx.drawTextWithShadow(textRenderer, Text.translatable("autologin.config.delay_unit"), width / 2 + 18, y2 + 5, 0x888888);
 
         // Empty state
         if (editedServers.isEmpty()) {
             int midY = HEADER_H + (height - HEADER_H - FOOTER_H) / 2;
             ctx.drawCenteredTextWithShadow(textRenderer,
-                Text.literal("No servers configured"), width / 2, midY - 8, 0x888888);
+                Text.translatable("autologin.config.no_servers"), width / 2, midY - 8, 0x888888);
             ctx.drawCenteredTextWithShadow(textRenderer,
-                Text.literal("Click \"+  Add Server\" to get started"), width / 2, midY + 6, 0x666666);
+                Text.translatable("autologin.config.no_servers_hint"), width / 2, midY + 6, 0x666666);
         }
     }
 
