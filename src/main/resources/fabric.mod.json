@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "autologin",
+  "version": "${version}",
+  "name": "AutoLogin",
+  "description": "Automatically sends /login command when joining servers that require authentication.",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.autologin.AutoLoginMod"
+    ]
+  },
+  "mixins": [],
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
