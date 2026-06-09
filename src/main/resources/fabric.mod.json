@@ -4,7 +4,7 @@
   "version": "${version}",
   "name": "AutoLogin",
   "description": "Automatically sends /login command when joining servers that require authentication.",
-  "authors": [],
+  "authors": ["HolJake", "Claude"],
   "contact": {},
   "license": "MIT",
   "environment": "client",
