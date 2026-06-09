@@ -16,7 +16,7 @@
       "com.autologin.AutoLoginConfigScreenFactory"
     ]
   },
-  "mixins": [],
+  "mixins": ["autologin.mixins.json"],
   "depends": {
     "fabricloader": ">=0.15.0",
     "minecraft": "~1.21.11",
