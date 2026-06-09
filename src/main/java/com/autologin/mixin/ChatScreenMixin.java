@@ -21,7 +21,7 @@ public class ChatScreenMixin {
 
     @Inject(method = "init", at = @At("TAIL"))
     private void autologin$maskPassword(CallbackInfo ci) {
-        ((EditBoxFormatterAccessor) this.input).autologin$setFormatter((text, cursorPos) -> {
+        ((EditBoxFormatterAccessor) this.input).autologin$setFormatter(text -> {
             String lower = text.toLowerCase();
             int passStart = -1;
             for (String cmd : AUTH_CMDS) {
