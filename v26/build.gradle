@@ -1,0 +1,69 @@
+plugins {
+    // Standard Loom (no -remap) — Minecraft 26.1+ is unobfuscated, no remapping needed
+    id 'net.fabricmc.fabric-loom' version '1.16-SNAPSHOT'
+    id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+repositories {
+    maven { url = "https://maven.terraformersmc.com/releases/" }
+    maven { url = "https://maven.shedaniel.me/" }
+}
+
+loom {
+    mods {
+        "autologin" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+// Share Java source with the root project (1.21 build)
+sourceSets.main {
+    java { srcDirs = [rootProject.file("src/main/java")] }
+    resources {
+        // v26-specific resources first (fabric.mod.json with >=26.1 requirement)
+        // then shared assets from root (lang, textures, etc.)
+        srcDirs = [
+            project.file("src/main/resources"),
+            rootProject.file("src/main/resources")
+        ]
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    // No mappings line — 26.1+ is unobfuscated, Mojang names are used directly
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    implementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+    implementation "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
+}
+
+processResources {
+    // v26 fabric.mod.json takes precedence over root's (listed first in srcDirs)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+
+    inputs.property "version", project.version
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 25
+}
+
+java {
+    withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
