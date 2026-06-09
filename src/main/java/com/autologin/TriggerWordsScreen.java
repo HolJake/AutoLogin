@@ -2,10 +2,8 @@ package com.autologin;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -41,7 +39,6 @@ public class TriggerWordsScreen extends Screen {
         wordList.refresh();
         addDrawableChild(wordList);
 
-        // Footer: [add field] [Add] [Done]
         int y = height - FOOTER_H + 6;
         addField = new TextFieldWidget(textRenderer, width / 2 - 140, y, 180, 18, Text.empty());
         addField.setMaxLength(128);
@@ -81,8 +78,7 @@ public class TriggerWordsScreen extends Screen {
 
         ctx.drawCenteredTextWithShadow(textRenderer, title, width / 2, 11, 0xFFFFFF);
         ctx.drawCenteredTextWithShadow(textRenderer,
-            Text.translatable("autologin.triggers.hint"),
-            width / 2, 21, 0x888888);
+            Text.translatable("autologin.triggers.hint"), width / 2, 21, 0x888888);
 
         ctx.fill(0, HEADER_H - 2, width, HEADER_H - 1, 0x55FFFFFF);
         ctx.fill(0, height - FOOTER_H, width, height - FOOTER_H + 1, 0x55FFFFFF);
@@ -114,8 +110,6 @@ public class TriggerWordsScreen extends Screen {
 
         WordListWidget(MinecraftClient client, int width, int height, int top, int itemHeight) {
             super(client, width, height, top, itemHeight);
-            setRenderBackground(false);
-            setRenderHorizontalShadows(false);
         }
 
         @Override
@@ -149,12 +143,6 @@ public class TriggerWordsScreen extends Screen {
                 removeBtn.setY(y + 4);
                 removeBtn.render(ctx, mx, my, delta);
             }
-
-            @Override
-            public List<? extends Element> children() { return List.of(removeBtn); }
-
-            @Override
-            public List<? extends Selectable> selectableChildren() { return List.of(removeBtn); }
 
             @Override
             public boolean mouseClicked(double mx, double my, int btn) {
