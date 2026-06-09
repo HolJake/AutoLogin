@@ -2,6 +2,6 @@
   "autologin.config.title": "AutoLogin — Настройки",
   "autologin.config.category": "Основное",
   "autologin.config.delay": "Задержка входа (мс)",
-  "autologin.config.servers": "Серверы (формат: ip=пароль)",
-  "autologin.triggers.title": "Слова-триггеры для входа"
+  "autologin.config.servers": "Серверы  (ip=пароль; ip2=пароль2)",
+  "autologin.triggers.title": "Слова-триггеры  (слово1, слово2, ...)"
 }

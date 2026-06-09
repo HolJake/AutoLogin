@@ -8,8 +8,8 @@ import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class AutoLoginConfigScreenFactory implements ModMenuApi {
 
@@ -33,33 +33,36 @@ public class AutoLoginConfigScreenFactory implements ModMenuApi {
                 .setSaveConsumer(v -> config.loginDelayMs = v)
                 .build());
 
-            // Servers — one entry per line in "ip=password" format
-            List<String> serverLines = new ArrayList<>();
-            for (Map.Entry<String, String> e : config.servers.entrySet()) {
-                serverLines.add(e.getKey() + "=" + e.getValue());
-            }
-            cat.addEntry(eb.startStringList(
-                    Component.translatable("autologin.config.servers"), serverLines)
-                .setDefaultValue(List.of())
-                .setSaveConsumer(list -> {
+            // Servers — "ip=password; ip2=password2" format
+            String serverStr = config.servers.entrySet().stream()
+                .map(e -> e.getKey() + "=" + e.getValue())
+                .collect(Collectors.joining("; "));
+            cat.addEntry(eb.startTextField(
+                    Component.translatable("autologin.config.servers"), serverStr)
+                .setDefaultValue("")
+                .setSaveConsumer(s -> {
                     config.servers.clear();
-                    for (String line : list) {
-                        int sep = line.indexOf('=');
+                    for (String part : s.split(";")) {
+                        part = part.trim();
+                        int sep = part.indexOf('=');
                         if (sep > 0) {
-                            String ip = line.substring(0, sep).trim();
-                            String pass = line.substring(sep + 1);
+                            String ip = part.substring(0, sep).trim();
+                            String pass = part.substring(sep + 1);
                             if (!ip.isEmpty()) config.servers.put(ip, pass);
                         }
                     }
                 })
                 .build());
 
-            // Trigger words
-            cat.addEntry(eb.startStringList(
-                    Component.translatable("autologin.triggers.title"),
-                    new ArrayList<>(config.triggerWords))
-                .setDefaultValue(List.of("Please", "/login"))
-                .setSaveConsumer(list -> config.triggerWords = new ArrayList<>(list))
+            // Trigger words — comma-separated
+            String triggerStr = String.join(", ", config.triggerWords);
+            cat.addEntry(eb.startTextField(
+                    Component.translatable("autologin.triggers.title"), triggerStr)
+                .setDefaultValue("Please, /login")
+                .setSaveConsumer(s -> config.triggerWords = Arrays.stream(s.split(","))
+                    .map(String::trim)
+                    .filter(t -> !t.isEmpty())
+                    .collect(Collectors.toCollection(ArrayList::new)))
                 .build());
 
             builder.setSavingRunnable(config::save);

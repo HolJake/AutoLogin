@@ -2,6 +2,6 @@
   "autologin.config.title": "AutoLogin — Settings",
   "autologin.config.category": "General",
   "autologin.config.delay": "Login delay (ms)",
-  "autologin.config.servers": "Servers (format: ip=password)",
-  "autologin.triggers.title": "Login trigger words"
+  "autologin.config.servers": "Servers  (ip=password; ip2=password2)",
+  "autologin.triggers.title": "Trigger words  (word1, word2, ...)"
 }
