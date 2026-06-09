@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
+import net.minecraft.client.gui.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.EntryListWidget;
@@ -116,6 +117,9 @@ public class TriggerWordsScreen extends Screen {
             setRenderBackground(false);
             setRenderHorizontalShadows(false);
         }
+
+        @Override
+        public void appendClickableNarrations(NarrationMessageBuilder builder) {}
 
         void refresh() {
             clearEntries();
