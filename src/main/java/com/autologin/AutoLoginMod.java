@@ -26,6 +26,7 @@ public class AutoLoginMod implements ClientModInitializer {
         AutoConfig.register(AutoLoginConfig.class, GsonConfigSerializer::new);
         config = AutoConfig.getConfigHolder(AutoLoginConfig.class).getConfig();
         AutoLoginToast.init();
+        migratePlaintextPasswords();
         LOGGER.info("[AutoLogin] Mod initialized. {} server(s) configured.", config.servers.size());
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
@@ -63,7 +64,7 @@ public class AutoLoginMod implements ClientModInitializer {
                 if (sep <= 0) return false;
                 return entry.substring(0, sep).trim().equalsIgnoreCase(serverIp);
             });
-            config.servers.add(serverIp + "=" + password);
+            config.servers.add(serverIp + "=" + PasswordCrypto.encode(password));
             AutoConfig.getConfigHolder(AutoLoginConfig.class).save();
             loginSentThisSession = true;
             LOGGER.info("[AutoLogin] Password saved for server: {}", serverIp);
@@ -124,5 +125,23 @@ public class AutoLoginMod implements ClientModInitializer {
 
     public static AutoLoginConfig getConfig() {
         return config;
+    }
+
+    private static void migratePlaintextPasswords() {
+        boolean changed = false;
+        for (int i = 0; i < config.servers.size(); i++) {
+            String entry = config.servers.get(i);
+            int sep = entry.indexOf('=');
+            if (sep <= 0) continue;
+            String value = entry.substring(sep + 1);
+            if (!PasswordCrypto.isEncoded(value)) {
+                config.servers.set(i, entry.substring(0, sep + 1) + PasswordCrypto.encode(value));
+                changed = true;
+            }
+        }
+        if (changed) {
+            AutoConfig.getConfigHolder(AutoLoginConfig.class).save();
+            LOGGER.info("[AutoLogin] Migrated plaintext passwords to encoded format.");
+        }
     }
 }

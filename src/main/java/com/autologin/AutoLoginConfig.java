@@ -48,7 +48,7 @@ public class AutoLoginConfig implements ConfigData {
             if (sep <= 0) continue;
             String ip = entry.substring(0, sep).trim();
             if (ip.equalsIgnoreCase(serverAddress) || stripPort(ip).equalsIgnoreCase(incomingHost)) {
-                return entry.substring(sep + 1);
+                return PasswordCrypto.decode(entry.substring(sep + 1));
             }
         }
         return null;
