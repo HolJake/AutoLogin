@@ -1,7 +1,7 @@
 package com.autologin;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.EntryListWidget;
@@ -48,7 +48,7 @@ public class ServerListWidget extends EntryListWidget<ServerListWidget.ServerEnt
         }
 
         @Override
-        public void render(DrawContext ctx, int index, int y, boolean hovered, float delta) {
+        public void render(GuiGraphics ctx, int index, int y, boolean hovered, float delta) {
             int x = ServerListWidget.this.getRowLeft();
             int entryWidth = ServerListWidget.this.getRowWidth();
 
