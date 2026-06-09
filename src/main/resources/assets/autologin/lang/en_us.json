@@ -12,6 +12,7 @@
 
   "text.autoconfig.autologin.option.loginDelayMs": "Login delay (ms)",
 
-  "autologin.message.sent": "§a[AutoLogin] §fPassword sent automatically",
-  "autologin.message.saved": "§a[AutoLogin] §fPassword saved for §e%s"
+  "autologin.toast.title": "[AutoLogin]",
+  "autologin.message.sent": "Password sent automatically",
+  "autologin.message.saved": "Password saved for: %s"
 }

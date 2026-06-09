@@ -12,6 +12,7 @@
 
   "text.autoconfig.autologin.option.loginDelayMs": "Задержка входа (мс)",
 
-  "autologin.message.sent": "§a[AutoLogin] §fПароль отправлен автоматически",
-  "autologin.message.saved": "§a[AutoLogin] §fПароль сохранён для §e%s"
+  "autologin.toast.title": "[AutoLogin]",
+  "autologin.message.sent": "Пароль отправлен автоматически",
+  "autologin.message.saved": "Пароль сохранён для: %s"
 }
