@@ -12,6 +12,12 @@
 
   "text.autoconfig.autologin.option.loginDelayMs": "Задержка входа (мс)",
 
+  "text.autoconfig.autologin.option.notificationCorner": "Угол уведомления",
+  "text.autoconfig.autologin.option.notificationCorner.@.TOP_RIGHT":    "Верхний правый",
+  "text.autoconfig.autologin.option.notificationCorner.@.TOP_LEFT":     "Верхний левый",
+  "text.autoconfig.autologin.option.notificationCorner.@.BOTTOM_RIGHT": "Нижний правый",
+  "text.autoconfig.autologin.option.notificationCorner.@.BOTTOM_LEFT":  "Нижний левый",
+
   "autologin.toast.title": "[AutoLogin]",
   "autologin.message.sent": "Пароль отправлен автоматически",
   "autologin.message.saved": "Пароль сохранён для: %s"

@@ -11,6 +11,8 @@ import java.util.List;
 @Config(name = "autologin")
 public class AutoLoginConfig implements ConfigData {
 
+    public enum Corner { TOP_RIGHT, TOP_LEFT, BOTTOM_RIGHT, BOTTOM_LEFT }
+
     @ConfigEntry.Category("servers")
     @ConfigEntry.Gui.Tooltip(count = 1)
     public List<String> servers = new ArrayList<>();
@@ -33,7 +35,10 @@ public class AutoLoginConfig implements ConfigData {
     @ConfigEntry.Category("mod")
     public long loginDelayMs = 300L;
 
-    // ── Helpers (not serialised) ──────────────────────────────────────────────
+    @ConfigEntry.Category("mod")
+    public Corner notificationCorner = Corner.TOP_RIGHT;
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
     public String getPassword(String serverAddress) {
         if (serverAddress == null) return null;

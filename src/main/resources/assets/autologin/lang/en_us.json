@@ -12,6 +12,12 @@
 
   "text.autoconfig.autologin.option.loginDelayMs": "Login delay (ms)",
 
+  "text.autoconfig.autologin.option.notificationCorner": "Notification corner",
+  "text.autoconfig.autologin.option.notificationCorner.@.TOP_RIGHT":    "Top Right",
+  "text.autoconfig.autologin.option.notificationCorner.@.TOP_LEFT":     "Top Left",
+  "text.autoconfig.autologin.option.notificationCorner.@.BOTTOM_RIGHT": "Bottom Right",
+  "text.autoconfig.autologin.option.notificationCorner.@.BOTTOM_LEFT":  "Bottom Left",
+
   "autologin.toast.title": "[AutoLogin]",
   "autologin.message.sent": "Password sent automatically",
   "autologin.message.saved": "Password saved for: %s"
