@@ -3,6 +3,7 @@
 
   "text.autoconfig.autologin.category.servers": "Servers",
   "text.autoconfig.autologin.category.mod": "Mod Parameters",
+  "text.autoconfig.autologin.category.transfer": "Password Transfer",
 
   "text.autoconfig.autologin.option.servers": "Server list",
   "text.autoconfig.autologin.option.servers.@Tooltip": "One entry per line — format: play.example.com=mypassword",
@@ -17,6 +18,18 @@
   "text.autoconfig.autologin.option.notificationCorner.@.TOP_LEFT":     "Top Left",
   "text.autoconfig.autologin.option.notificationCorner.@.BOTTOM_RIGHT": "Bottom Right",
   "text.autoconfig.autologin.option.notificationCorner.@.BOTTOM_LEFT":  "Bottom Left",
+
+  "text.autoconfig.autologin.option.transferExportKey": "Your transfer key (copy this)",
+  "text.autoconfig.autologin.option.transferExportKey.@Tooltip[0]": "Copy this key and paste it into the Import field on another device — all your passwords will transfer automatically.",
+  "text.autoconfig.autologin.option.transferExportKey.@Tooltip[1]": "⚠ NEVER share this key with anyone!",
+  "text.autoconfig.autologin.option.transferExportKey.@Tooltip[2]": "This key contains ALL of your saved passwords.",
+  "text.autoconfig.autologin.option.transferExportKey.@Tooltip[3]": "If someone asks you to send it to them — that is a scammer. Never give your key to anyone.",
+
+  "text.autoconfig.autologin.option.transferImportKey": "Paste transfer key here to import",
+  "text.autoconfig.autologin.option.transferImportKey.@Tooltip[0]": "Paste a transfer key generated on your other device and click Save. The passwords will be merged with your current ones.",
+  "text.autoconfig.autologin.option.transferImportKey.@Tooltip[1]": "⚠ NEVER share your own transfer key with anyone!",
+  "text.autoconfig.autologin.option.transferImportKey.@Tooltip[2]": "Only paste keys that you generated yourself on another device.",
+  "text.autoconfig.autologin.option.transferImportKey.@Tooltip[3]": "If someone sent you a key and is asking you to paste it — do not do it. It is a trap.",
 
   "autologin.toast.title": "[AutoLogin]",
   "autologin.message.sent": "Password sent automatically",

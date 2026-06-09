@@ -26,6 +26,17 @@ public class AutoLoginMod implements ClientModInitializer {
         AutoConfig.register(AutoLoginConfig.class, GsonConfigSerializer::new);
         config = AutoConfig.getConfigHolder(AutoLoginConfig.class).getConfig();
         AutoLoginToast.init();
+
+        // Re-save config if validatePostLoad made changes (export key refresh, import processing, migration)
+        AutoConfig.getConfigHolder(AutoLoginConfig.class).registerLoadListener((manager, data) -> {
+            if (data.needsSave) {
+                data.needsSave = false;
+                Minecraft.getInstance().execute(() ->
+                        AutoConfig.getConfigHolder(AutoLoginConfig.class).save());
+            }
+            return net.minecraft.world.InteractionResult.PASS;
+        });
+
         migratePlaintextPasswords();
         LOGGER.info("[AutoLogin] Mod initialized. {} server(s) configured.", config.servers.size());
 

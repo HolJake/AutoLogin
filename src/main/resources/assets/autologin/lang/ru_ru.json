@@ -3,6 +3,7 @@
 
   "text.autoconfig.autologin.category.servers": "Серверы",
   "text.autoconfig.autologin.category.mod": "Параметры мода",
+  "text.autoconfig.autologin.category.transfer": "Перенос паролей",
 
   "text.autoconfig.autologin.option.servers": "Список серверов",
   "text.autoconfig.autologin.option.servers.@Tooltip": "По одной записи на строку — формат: play.example.com=мойпароль",
@@ -17,6 +18,18 @@
   "text.autoconfig.autologin.option.notificationCorner.@.TOP_LEFT":     "Верхний левый",
   "text.autoconfig.autologin.option.notificationCorner.@.BOTTOM_RIGHT": "Нижний правый",
   "text.autoconfig.autologin.option.notificationCorner.@.BOTTOM_LEFT":  "Нижний левый",
+
+  "text.autoconfig.autologin.option.transferExportKey": "Ваш ключ переноса (скопируйте)",
+  "text.autoconfig.autologin.option.transferExportKey.@Tooltip[0]": "Скопируйте этот ключ и вставьте его в поле «Импорт» на другом устройстве — все пароли перенесутся автоматически.",
+  "text.autoconfig.autologin.option.transferExportKey.@Tooltip[1]": "⚠ НИКОМУ не показывайте этот ключ!",
+  "text.autoconfig.autologin.option.transferExportKey.@Tooltip[2]": "Этот ключ содержит ВСЕ ваши пароли.",
+  "text.autoconfig.autologin.option.transferExportKey.@Tooltip[3]": "Если кто-то просит вас его отправить — это мошенник. Никогда не передавайте ключ посторонним.",
+
+  "text.autoconfig.autologin.option.transferImportKey": "Вставьте ключ переноса сюда",
+  "text.autoconfig.autologin.option.transferImportKey.@Tooltip[0]": "Вставьте ключ переноса, полученный с другого устройства, и нажмите «Сохранить». Пароли будут добавлены к текущим.",
+  "text.autoconfig.autologin.option.transferImportKey.@Tooltip[1]": "⚠ НИКОМУ не передавайте ваш ключ переноса!",
+  "text.autoconfig.autologin.option.transferImportKey.@Tooltip[2]": "Вставляйте сюда только ключи, сгенерированные вами на другом своём устройстве.",
+  "text.autoconfig.autologin.option.transferImportKey.@Tooltip[3]": "Если кто-то прислал вам ключ и просит вставить его — не делайте этого. Это ловушка.",
 
   "autologin.toast.title": "[AutoLogin]",
   "autologin.message.sent": "Пароль отправлен автоматически",
