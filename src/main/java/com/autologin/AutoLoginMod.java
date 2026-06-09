@@ -1,5 +1,7 @@
 package com.autologin;
 
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -19,7 +21,8 @@ public class AutoLoginMod implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        config = AutoLoginConfig.load();
+        AutoConfig.register(AutoLoginConfig.class, GsonConfigSerializer::new);
+        config = AutoConfig.getConfigHolder(AutoLoginConfig.class).getConfig();
         LOGGER.info("[AutoLogin] Mod initialized. {} server(s) configured.", config.servers.size());
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {

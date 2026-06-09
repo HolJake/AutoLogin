@@ -1,7 +1,11 @@
 {
-  "autologin.config.title": "AutoLogin — Settings",
-  "autologin.config.category": "General",
-  "autologin.config.delay": "Login delay (ms)",
-  "autologin.config.servers": "Servers  (ip=password; ip2=password2)",
-  "autologin.triggers.title": "Trigger words  (word1, word2, ...)"
+  "text.config.autologin.title": "AutoLogin — Settings",
+
+  "text.config.autologin.option.servers": "Servers",
+  "text.config.autologin.option.servers.tooltip[0]": "One entry per line — format: play.example.com=mypassword",
+
+  "text.config.autologin.option.triggerWords": "Login trigger words",
+  "text.config.autologin.option.triggerWords.tooltip[0]": "Password is sent when a chat message contains any of these words",
+
+  "text.config.autologin.option.loginDelayMs": "Login delay (ms)"
 }
