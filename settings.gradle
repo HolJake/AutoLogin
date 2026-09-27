@@ -7,3 +7,14 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
+rootProject.name = 'AutoLogin'
+
+include 'mc121', 'mc261', 'mc262', 'mc263'
+['mc121', 'mc261', 'mc262', 'mc263'].each { name ->
+    project(":${name}").projectDir = file("variants/${name}")
+}

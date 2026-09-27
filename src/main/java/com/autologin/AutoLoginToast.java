@@ -3,109 +3,113 @@ package com.autologin;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class AutoLoginToast {
-
-    private static final long DISPLAY_MS = 7000L;  // 7 секунд
-    private static final long FADE_MS    = 500L;
-    private static final int  WIDTH      = 230;
-    private static final int  HEIGHT     = 44;
-    private static final int  MARGIN     = 4;
-
+/** Small, monochrome HUD notifications that fit the current GUI scale. */
+public final class AutoLoginToast {
+    private static final long DISPLAY_MS = 5200L;
+    private static final long ENTER_MS = 280L;
+    private static final long EXIT_MS = 360L;
+    private static final int MAX_WIDTH = 280;
+    private static final int HEIGHT = 56;
+    private static final int MARGIN = 8;
+    private static final int GAP = 6;
     private static final List<Notification> queue = new ArrayList<>();
 
+    private AutoLoginToast() {}
+
     public static void init() {
-        // Register at LAST position — renders on top of vanilla HUD elements
         HudRenderCallback.EVENT.register(AutoLoginToast::renderHud);
     }
 
-    /** Thread-safe: schedules display on the main thread. */
     public static void show(Component message) {
-        Minecraft.getInstance().execute(() -> queue.add(new Notification(message)));
+        Minecraft.getInstance().execute(() -> {
+            if (queue.size() == 6) queue.remove(0);
+            queue.add(new Notification(message));
+        });
     }
 
-    private static void renderHud(GuiGraphics ctx, DeltaTracker delta) {
+    private static void renderHud(GuiGraphics gui, DeltaTracker delta) {
         queue.removeIf(Notification::expired);
         if (queue.isEmpty()) return;
 
-        Minecraft mc   = Minecraft.getInstance();
-        AutoLoginConfig cfg = AutoLoginMod.getConfig();
-
+        Minecraft mc = Minecraft.getInstance();
+        AutoLoginConfig config = AutoLoginMod.getConfig();
         int screenW = mc.getWindow().getGuiScaledWidth();
         int screenH = mc.getWindow().getGuiScaledHeight();
+        int width = Math.min(MAX_WIDTH, screenW - MARGIN * 2);
+        if (width < 60 || screenH < HEIGHT + MARGIN * 2) return;
 
-        boolean onRight  = cfg.notificationCorner == AutoLoginConfig.Corner.TOP_RIGHT
-                        || cfg.notificationCorner == AutoLoginConfig.Corner.BOTTOM_RIGHT;
-        boolean onBottom = cfg.notificationCorner == AutoLoginConfig.Corner.BOTTOM_RIGHT
-                        || cfg.notificationCorner == AutoLoginConfig.Corner.BOTTOM_LEFT;
+        boolean right = config.notificationCorner == AutoLoginConfig.Corner.TOP_RIGHT
+                || config.notificationCorner == AutoLoginConfig.Corner.BOTTOM_RIGHT;
+        boolean bottom = config.notificationCorner == AutoLoginConfig.Corner.BOTTOM_RIGHT
+                || config.notificationCorner == AutoLoginConfig.Corner.BOTTOM_LEFT;
+        int baseX = right ? screenW - width - MARGIN : MARGIN;
+        int baseY = bottom ? screenH - HEIGHT - MARGIN : MARGIN;
+        int visible = Math.max(1, (screenH - MARGIN * 2 + GAP) / (HEIGHT + GAP));
+        int first = Math.max(0, queue.size() - visible);
 
-        int x  = onRight  ? screenW - WIDTH - MARGIN : MARGIN;
-        int y0 = onBottom ? screenH - HEIGHT - MARGIN : MARGIN;
-        int dy = onBottom ? -(HEIGHT + 2) : (HEIGHT + 2);
-
-        // Bottom corners: stack upward, so reverse list to keep newest at edge
-        List<Notification> ordered = onBottom ? reversed(queue) : queue;
-
-        int y = y0;
-        for (Notification n : ordered) {
-            drawNotification(ctx, mc, n, x, y);
-            y += dy;
+        for (int index = queue.size() - 1, slot = 0; index >= first; index--, slot++) {
+            int y = baseY + (bottom ? -slot : slot) * (HEIGHT + GAP);
+            drawNotification(gui, mc.font, queue.get(index), baseX, y, width, right);
         }
     }
 
-    private static void drawNotification(GuiGraphics ctx, Minecraft mc,
-                                         Notification n, int x, int y) {
-        float alpha = n.alpha();
-        int a  = (int)(alpha * 255);
-        int aB = (int)(alpha * 0xF0);  // slightly more opaque background
+    private static void drawNotification(GuiGraphics gui, Font font, Notification notice,
+                                         int baseX, int y, int width, boolean right) {
+        long age = notice.age();
+        float entrance = easeOut(Math.min(1f, age / (float) ENTER_MS));
+        float exit = age > DISPLAY_MS - EXIT_MS
+                ? 1f - easeIn(Math.min(1f, (age - DISPLAY_MS + EXIT_MS) / (float) EXIT_MS)) : 1f;
+        float opacity = Math.max(0f, entrance * exit);
+        if (opacity < 0.04f) return;
+        int offset = Math.round((1f - entrance) * 22f) * (right ? 1 : -1);
+        int x = baseX + offset;
 
-        // Background
-        ctx.fill(x,     y, x + WIDTH, y + HEIGHT, argb(0x0E, 0x0E, 0x0E, aB));
-        // Left accent stripe
-        ctx.fill(x,     y, x + 3,     y + HEIGHT, argb(0x3D, 0xC2, 0x3D, a));
-        // Thin top line (same green, dimmer)
-        ctx.fill(x + 3, y, x + WIDTH, y + 1,      argb(0x3D, 0xC2, 0x3D, a / 3));
+        gui.fill(x, y, x + width, y + HEIGHT, color(0x141414, Math.round(opacity * 194)));
+        gui.fill(x, y, x + width, y + 1, color(0xFFFFFF, Math.round(opacity * 62)));
+        gui.fill(x, y + HEIGHT - 1, x + width, y + HEIGHT, color(0xFFFFFF, Math.round(opacity * 42)));
+        gui.fill(x + 10, y + 11, x + 12, y + 25, color(0xFFFFFF, Math.round(opacity * 205)));
 
-        ctx.drawString(mc.font, Component.translatable("autologin.toast.title"),
-            x + 8, y + 8,  argb(0x7F, 0xFF, 0x7F, a), false);
-        ctx.drawString(mc.font, n.message,
-            x + 8, y + 24, argb(0xE0, 0xE0, 0xE0, a), false);
-    }
-
-    private static List<Notification> reversed(List<Notification> src) {
-        List<Notification> copy = new ArrayList<>(src);
-        Collections.reverse(copy);
-        return copy;
-    }
-
-    private static int argb(int r, int g, int b, int a) {
-        return (Mth.clamp(a, 0, 255) << 24) | (r << 16) | (g << 8) | b;
-    }
-
-    // ── Notification ─────────────────────────────────────────────────────────
-
-    private static class Notification {
-        final Component message;
-        final long shownAt = System.currentTimeMillis();
-
-        Notification(Component message) { this.message = message; }
-
-        long age()        { return System.currentTimeMillis() - shownAt; }
-        boolean expired() { return age() >= DISPLAY_MS; }
-
-        float alpha() {
-            long age = age();
-            if (age < FADE_MS) return (float) age / FADE_MS;
-            long remaining = DISPLAY_MS - age;
-            if (remaining < FADE_MS) return Math.max(0f, (float) remaining / FADE_MS);
-            return 1f;
+        LegacyTextRenderer.draw(gui, font, Component.translatable("autologin.toast.title"),
+                x + 19, y + 12, color(0xFFFFFF, Math.round(opacity * 255)), false);
+        String message = notice.message.getString();
+        int lineWidth = width - 24;
+        String first = font.plainSubstrByWidth(message, lineWidth);
+        String remaining = message.substring(first.length()).stripLeading();
+        String second = font.plainSubstrByWidth(remaining, lineWidth);
+        if (second.length() < remaining.length() && !second.isEmpty()) {
+            second = font.plainSubstrByWidth(second, lineWidth - font.width("…")) + "…";
         }
+        LegacyTextRenderer.draw(gui, font, Component.literal(first),
+                x + 12, y + 30, color(0xF0F0F0, Math.round(opacity * 245)), false);
+        if (!second.isEmpty()) LegacyTextRenderer.draw(gui, font, Component.literal(second),
+                x + 12, y + 42, color(0xD0D0D0, Math.round(opacity * 220)), false);
+    }
+
+    private static float easeOut(float progress) {
+        return 1f - (float) Math.pow(1f - progress, 3);
+    }
+
+    private static float easeIn(float progress) {
+        return progress * progress * progress;
+    }
+
+    private static int color(int rgb, int alpha) {
+        return Math.max(0, Math.min(255, alpha)) << 24 | rgb;
+    }
+
+    private static final class Notification {
+        private final Component message;
+        private final long start = System.nanoTime();
+
+        private Notification(Component message) { this.message = message; }
+        private long age() { return (System.nanoTime() - start) / 1_000_000L; }
+        private boolean expired() { return age() >= DISPLAY_MS; }
     }
 }

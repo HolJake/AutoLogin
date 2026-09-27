@@ -36,6 +36,15 @@ public class AutoLoginConfig implements ConfigData {
     public long loginDelayMs = 300L;
 
     @ConfigEntry.Category("mod")
+    public boolean autoLoginEnabled = true;
+
+    @ConfigEntry.Category("mod")
+    public boolean autoSavePasswords = true;
+
+    @ConfigEntry.Category("mod")
+    public boolean matchSubdomains = true;
+
+    @ConfigEntry.Category("mod")
     public Corner notificationCorner = Corner.BOTTOM_RIGHT;
 
     // ── Transfer ──────────────────────────────────────────────────────────────
@@ -93,7 +102,7 @@ public class AutoLoginConfig implements ConfigData {
         }
 
         // ── Pass 2: root-domain|nick ──────────────────────────────────────────
-        if (hasNick && incomingRoot != null) {
+        if (matchSubdomains && hasNick && incomingRoot != null) {
             for (String entry : servers) {
                 int eq = entry.indexOf('=');
                 if (eq <= 0) continue;
@@ -123,7 +132,7 @@ public class AutoLoginConfig implements ConfigData {
         }
 
         // ── Pass 4: root-domain (legacy, no nick) ─────────────────────────────
-        if (incomingRoot != null) {
+        if (matchSubdomains && incomingRoot != null) {
             for (String entry : servers) {
                 int eq = entry.indexOf('=');
                 if (eq <= 0) continue;

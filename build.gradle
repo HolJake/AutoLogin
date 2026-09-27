@@ -1,44 +1,48 @@
 plugins {
-    id 'net.fabricmc.fabric-loom-remap' version '1.16-SNAPSHOT'
-    id 'maven-publish'
+    id 'base'
+    id 'net.fabricmc.fabric-loom-remap' version '1.16-SNAPSHOT' apply false
+    id 'net.fabricmc.fabric-loom' version '1.16-SNAPSHOT' apply false
 }
 
-version = project.mod_version
-group = project.maven_group
+// Each variant compiles once, then declares only the releases it supports.
+ext.variants = [
+    mc121:  [compile: '1.21.1', artifact: '1.21.x', minecraftRange: '>=1.21.1 <1.22',
+             versions: ['1.21.1', '1.21.2', '1.21.3', '1.21.4', '1.21.5',
+                                         '1.21.6', '1.21.7', '1.21.8', '1.21.9', '1.21.10', '1.21.11'],
+             fabric: '0.116.17+1.21.1', modmenu: '11.0.5', cloth: '15.0.140'],
+    mc261:  [compile: '26.1', artifact: '26.1.x', minecraftRange: '>=26.1 <26.2',
+             versions: ['26.1', '26.1.1', '26.1.2'],
+             fabric: '0.145.1+26.1', modmenu: '18.0.2', cloth: '26.1.154'],
+    mc262:  [compile: '26.2', artifact: '26.2.x', minecraftRange: '>=26.2 <26.3',
+             versions: ['26.2'],
+             fabric: '0.161.0+26.2', modmenu: '20.0.3', cloth: '26.2.155'],
+    mc263:  [compile: '26.3', artifact: '26.3.x', minecraftRange: '>=26.3 <26.4',
+             versions: ['26.3'],
+             fabric: '0.161.0+26.3', modmenu: '21.0.0', cloth: '26.3.159']
+]
 
-base {
-    archivesName = project.archives_base_name
+subprojects {
+    apply from: rootProject.file('gradle/variant.gradle')
 }
 
-repositories {
-    maven { url = "https://maven.terraformersmc.com/releases/" }
-    maven { url = "https://maven.shedaniel.me/" }
+def requested = providers.gradleProperty('mcVersion').orNull
+def selected = requested == null ? variants.keySet().toList()
+        : variants.findAll { name, spec -> spec.versions.contains(requested) }.keySet().toList()
+if (selected.isEmpty()) {
+    throw new GradleException("Unsupported Minecraft version: ${requested}")
 }
 
-dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-    modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-    modImplementation "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
-}
-
-processResources {
-    inputs.property "version", project.version
-
-    filesMatching("fabric.mod.json") {
-        expand "version": project.version
+tasks.register('collectReleaseJars', Sync) {
+    group = 'build'
+    description = 'Collect the selected ready-to-install Minecraft JARs in build/releases.'
+    dependsOn selected.collect { ":${it}:build" }
+    selected.each { name ->
+        def filename = "autologin-mc${variants[name].artifact}-${mod_version}.jar"
+        from file("variants/${name}/build/libs/${filename}")
     }
+    into layout.buildDirectory.dir('releases')
 }
 
-tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
-}
-
-java {
-    withSourcesJar()
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+tasks.named('build') {
+    dependsOn tasks.named('collectReleaseJars')
 }

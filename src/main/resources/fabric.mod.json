@@ -19,8 +19,8 @@
   "mixins": [],
   "depends": {
     "fabricloader": ">=0.15.0",
-    "minecraft": ">=1.21",
-    "java": ">=21",
+    "minecraft": "MINECRAFT_VERSION_RANGE",
+    "java": ">=${java_version}",
     "fabric-api": "*",
     "cloth-config": "*"
   },
